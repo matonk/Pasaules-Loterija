@@ -27,7 +27,7 @@ export default async function handler(req, res) {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${process.env.Matisons}` // Ensure this matches your Vercel Environment Variable name exactly
+                "Authorization": `Bearer AQ.Ab8RN6JY4J7oDHvrDIo4dsrQw83mugiGxeo4exRHBf3SnWJmTQ`
             },
             body: JSON.stringify({
                 model: "gemini-2.5-flash", // Using a highly stable, free-tier flash model
