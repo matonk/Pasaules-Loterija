@@ -17,22 +17,25 @@ export default async function handler(req, res) {
     - Intelligence: ${iqLimenis || '100'} IQ
     - Life Challenge (Wild Card): ${wildcard ? `${wildcard.title} - ${wildcard.desc}` : 'None'}
 
-    Task: Write a witty, highly realistic, and brutally honest 3-paragraph summary of what their life journey will look like (childhood, education/career prospects, and old age/quality of life). Base your logic on actual geopolitical realities, economic standing, and the severity of their specific challenge.
+    Task: Write a witty, highly realistic, and brutally honest 2-3 paragraph summary of what their life journey will look like (childhood, education/career prospects, and old age/quality of life). Base your logic on actual geopolitical realities, economic standing, and the severity of their specific challenge.
     
     CRITICAL: Write the entire response in fluent, natural Latvian. Do not break character. Do not use formatting like markdown bolding inside the text, just give pure paragraph breaks.
     `;
 
     try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
+        const response = await fetch("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", {
+            method: "POST",
             headers: {
-                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-                'Content-Type': 'application/json'
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${process.env.Matisons}` // Ensure this matches your Vercel Environment Variable name exactly
             },
             body: JSON.stringify({
-                model: 'gpt-4o-mini', // Cost-effective and highly capable
-                messages: [{ role: 'user', content: prompt }],
-                temperature: 0.8
+                model: "gemini-2.5-flash", // Using a highly stable, free-tier flash model
+                messages: [
+                    { role: "user", content: prompt } // FIX 1: Passed your actual generated life-factor prompt here
+                ]
+                // FIX 2: Removed response_format: { type: "json_object" }
+                // Because your prompt explicitly requests standard text paragraphs, forcing JSON would cause an API error.
             })
         });
 
