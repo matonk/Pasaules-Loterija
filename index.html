@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pasaules Loterija</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        .select-none {-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}
+        * {box-sizing:border-box;} body {font-family:'Poppins',sans-serif;background-color:#f0f2f5;color:#333;margin:0;padding:0;min-height:100vh;-webkit-tap-highlight-color:transparent;}
+        .main-container {text-align:center;max-width:600px;padding:60px 20px 40px;width:100%;margin:0 auto;}
+        h1 {color:#2c3e50;margin-bottom:40px;font-weight:600;font-size:clamp(22px,5vw,32px);}
+        .option-card {background:white;padding:30px;margin-bottom:20px;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,0.1);transition:transform 0.2s ease;}
+        @media(hover:hover){.option-card:hover{transform:translateY(-5px);}}
+        .btn {background-color:#3498db;color:white;border:none;padding:14px 24px;font-size:16px;font-weight:600;border-radius:8px;cursor:pointer;transition:background-color 0.2s ease;width:100%;max-width:280px;display:inline-block;touch-action:manipulation;-webkit-tap-highlight-color:transparent;} .btn:active{background-color:#2471a3;transform:scale(0.98);}
+        .btn:hover {background-color:#2980b9;}
+        .description {font-size:14px;color:#7f8c8d;margin-top:15px;margin-bottom:0;line-height:1.5;}
+        #rezultats {margin-top:20px;text-align:left;}
+        #rezultats h3 {text-align:center;color:#2c3e50;margin-top:0;}
+        #rezultats p {margin:10px 0;font-size:15px;}
+
+        /* --- Ņemt vai neņemt styles --- */
+        #nvn-container {display:none;text-align:left;}
+        .nvn-card {background:white;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,0.1);padding:28px 30px;margin-bottom:20px;position:relative;}
+        .nvn-header {display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+        .nvn-counter {font-size:13px;color:#95a5a6;font-weight:600;letter-spacing:0.5px;}
+        .nvn-progress-bar {display:flex;gap:6px;margin-bottom:24px;}
+        .nvn-progress-dot {flex:1;height:5px;border-radius:3px;background:#e0e0e0;transition:background 0.3s ease;}
+        .nvn-progress-dot.done {background:#2ecc71;}
+        .nvn-progress-dot.current {background:#3498db;}
+        .nvn-result-display h3 {text-align:center;color:#2c3e50;margin:0 0 16px;}
+        .nvn-result-display p {margin:8px 0;font-size:15px;}
+        .nvn-actions {display:flex;gap:12px;margin-top:22px;}
+        .nvn-btn-accept {flex:1;background:#2ecc71;color:white;border:none;padding:16px 13px;font-size:16px;font-weight:600;border-radius:8px;cursor:pointer;transition:background 0.2s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;min-height:54px;} .nvn-btn-accept:active{background:#1aa358;transform:scale(0.97);}
+        .nvn-btn-accept:hover {background:#27ae60;}
+        .nvn-btn-reject {flex:1;background:#e74c3c;color:white;border:none;padding:16px 13px;font-size:16px;font-weight:600;border-radius:8px;cursor:pointer;transition:background 0.2s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;min-height:54px;} .nvn-btn-reject:active{background:#b03020;transform:scale(0.97);}
+        .nvn-btn-reject:hover {background:#c0392b;}
+        .nvn-btn-next {width:100%;background:#3498db;color:white;border:none;padding:13px;font-size:16px;font-weight:600;border-radius:8px;cursor:pointer;margin-top:12px;transition:background 0.2s;}
+        .nvn-btn-next:hover {background:#2980b9;}
+        .nvn-unknown-badge {display:inline-block;background:#f39c12;color:white;font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;margin-bottom:8px;}
+        .nvn-final-card {background:white;border-radius:12px;box-shadow:0 6px 16px rgba(0,0,0,0.12);padding:30px;text-align:left;}
+        .nvn-final-card h3 {text-align:center;color:#2c3e50;margin-top:0;}
+        .nvn-final-card .result-label {font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#95a5a6;font-weight:600;margin-bottom:4px;}
+        .nvn-final-card .result-value {font-size:16px;font-weight:600;color:#2c3e50;margin-bottom:16px;}
+        .nvn-chosen-badge {display:inline-block;background:#2ecc71;color:white;font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+        .nvn-forced-badge {display:inline-block;background:#e67e22;color:white;font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;margin-left:8px;vertical-align:middle;}
+        .nvn-restart-btn {width:100%;background:#3498db;color:white;border:none;padding:16px;font-size:16px;font-weight:600;border-radius:8px;cursor:pointer;margin-top:20px;transition:background 0.2s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;min-height:54px;} .nvn-restart-btn:active{background:#2471a3;transform:scale(0.98);}
+        .nvn-restart-btn:hover {background:#2980b9;}
+        .nvn-tip {font-size:13px;color:#95a5a6;text-align:center;margin-top:6px;}
+        .nvn-skipped-list {margin-top:16px;border-top:1px solid #f0f0f0;padding-top:14px;}
+        .nvn-skipped-list h4 {color:#7f8c8d;font-size:13px;margin:0 0 10px;}
+        .nvn-skipped-item {font-size:13px;color:#95a5a6;padding:4px 0;border-bottom:1px dashed #f0f0f0;}
+        .nvn-skipped-item:last-child {border-bottom:none;}
+        @keyframes slideIn {from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+        .slide-in {animation:slideIn 0.3s ease forwards;}
+        
+        /* --- Wild Card Base --- */
+        .wildcard-badge {display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;margin-left:6px;vertical-align:middle;}
+        .wildcard-badge.debuff-badge {background:#3a1a1a;color:#e74c3c;border:1px solid #e74c3c;}
+
+        /* --- Wild Card Draft Mechanics --- */
+        .wildcard-draft-title {text-align:center;color:#2c3e50;font-weight:600;margin-bottom:10px;font-size:20px;}
+        .wildcard-draft-grid {display:flex;flex-direction:column;gap:16px;margin:24px 0;}
+        @media(min-width:600px){.wildcard-draft-grid {flex-direction:row;}}
+        .draft-card {flex:1;border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;border:2px solid transparent;color:white;display:flex;flex-direction:column;justify-content:center;min-height:160px;}
+        .draft-card:hover {transform:translateY(-4px);}
+        .draft-card.debuff {background:linear-gradient(135deg,#3a1a1a,#2d0f0f);border-color:#e74c3c;box-shadow:0 4px 12px rgba(231,76,60,0.15);}
+        .draft-card.debuff:hover {box-shadow:0 6px 18px rgba(231,76,60,0.3);}
+        .draft-emoji {font-size:36px;margin-bottom:6px;}
+        .draft-name {font-size:15px;font-weight:700;margin-bottom:6px;}
+        .draft-desc {font-size:12px;opacity:0.8;line-height:1.4;}
+        .nvn-active-wildcard {margin-bottom:20px;padding:14px;border-radius:8px;font-size:13px;line-height:1.5;text-align:left;}
+        .nvn-active-wildcard.debuff {background:rgba(231,76,60,0.12);color:#c0392b;border:1px solid rgba(231,76,60,0.3);}
+        body.dark .nvn-active-wildcard.debuff {color:#e74c3c;}
+
+        /* --- Dark mode toggle button --- */
+        #dark-toggle {position:fixed;top:12px;right:12px;width:46px;height:46px;border-radius:50%;border:none;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;background:white;box-shadow:0 2px 8px rgba(0,0,0,0.15);transition:background 0.3s,box-shadow 0.3s;z-index:999;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+        #dark-toggle:hover {box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+
+        /* --- Dark mode --- */
+        body.dark {background-color:#1a1d23;color:#e0e0e0;}
+        body.dark h1 {color:#e0e0e0;}
+        body.dark .wildcard-draft-title {color:#e0e0e0;}
+        body.dark .option-card {background:#2a2d35;box-shadow:0 4px 6px rgba(0,0,0,0.4);}
+        body.dark .description {color:#95a5a6;}
+        body.dark #rezultats h3 {color:#e0e0e0;}
+        body.dark .nvn-card {background:#2a2d35;box-shadow:0 4px 6px rgba(0,0,0,0.4);}
+        body.dark .nvn-counter {color:#7f8c8d;}
+        body.dark .nvn-progress-dot {background:#3d4147;}
+        body.dark .nvn-progress-dot.done {background:#2ecc71;}
+        body.dark .nvn-progress-dot.current {background:#3498db;}
+        body.dark .nvn-result-display h3 {color:#e0e0e0;}
+        body.dark .nvn-tip {color:#7f8c8d;}
+        body.dark .nvn-skipped-list {border-top-color:#3d4147;}
+        body.dark .nvn-skipped-item {color:#7f8c8d;border-bottom-color:#3d4147;}
+        body.dark .nvn-final-card {background:#2a2d35;box-shadow:0 6px 16px rgba(0,0,0,0.4);}
+        body.dark .nvn-final-card h3 {color:#e0e0e0;}
+        body.dark .nvn-final-card .result-label {color:#7f8c8d;}
+        body.dark .nvn-final-card .result-value {color:#e0e0e0;}
+        body.dark #dark-toggle {background:#2a2d35;box-shadow:0 2px 8px rgba(0,0,0,0.5);}
+        body.dark .wildcard-badge.debuff-badge {background:#3a1a1a;}
+
+        @media(max-width:480px){
+            .main-container{padding:56px 14px 32px;}
+            .option-card{padding:22px 18px;}
+            .nvn-card{padding:20px 16px;}
+            .nvn-final-card{padding:22px 16px;}
+            .nvn-actions{gap:10px;}
+            h1{margin-bottom:24px;}
+            .wildcard-draft-grid {gap:12px;}
+            .draft-card {min-height:130px; padding:15px;}
+        }
+    </style>
+</head>
+<body>
+    <button id="dark-toggle" onclick="toggleDark()" title="Tumšais režīms">🌙</button>
+    <div class="main-container">
+        <h1>Pasaules Loterija</h1>
+
+        <div id="menu-view">
+            <div class="option-card">
+                <button class="btn select-none" onclick="StartSimulation()">Bezgalīga simulācija</button>
+                <p class="description select-none">Simulē, cik vien vēlies!</p>
+            </div>
+            <div class="option-card">
+                <button class="btn select-none" onclick="StartNVN()" style="background-color:#9b59b6;">Ņemt vai neņemt</button>
+                <p class="description select-none">Izvēlies sev dzīves izaicinājumu un mēģini piemeklēt tam labāko valsti!</p>
+            </div>
+            <div id="rezultats"></div>
+        </div>
+
+        <!-- Ņemt vai neņemt section -->
+        <div id="nvn-container">
+            <div id="nvn-inner"></div>
+        </div>
+    </div>
+
+    <script>
+
+        function generēZvanaSkaitli(vidējais = 100, novirze = 15) {
+    let u = 0, v = 0;
+    // Box-Muller transformācija
+    while(u === 0) u = Math.random(); 
+    while(v === 0) v = Math.random();
+    let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    
+    return Math.round(vidējais + num * novirze);
+}
+    const DEBUFFS = [
+        { emoji:"🧱", title:"Dumjš kā akmens", desc:"Jebkas sarežģītāks par 'laba diena' sagādā grūtības. Mācīšanās ir cīņa. Katru dienu." },
+        { emoji:"🦽", title:"Nav kāju", desc:"Ratiņkrēsls. Pasaule nav būvēta priekš tevis — bet tu pierādīsi, ka tas nav šķērslis." },
+        { emoji:"💔", title:"Cerebrālā trieka", desc:"Kustību kontrole ir izaicinājums. Katrs solis, katrs vārds prasa divreiz vairāk pūļu." },
+        { emoji:"👁️", title:"Akls", desc:"Pilnīgs redzes zudums. Pasaule ir skaņas un pieskārieni. Tu iemācīsies to citādāk." },
+        { emoji:"👂", title:"Kurls", desc:"Klusums visur. Komunikācija ar citiem prasa tulku vai roku zīmes. Mūzika — tikai vibrācija." },
+        { emoji:"😬", title:"Sociālā fobija", desc:"Katrs cilvēks ir drauds. Veikals — murgs. Darbs birojā — neiespējami. Vientulība kļūst par dzīvesveidu." },
+        { emoji:"🤧", title:"Vāja imunitāte", desc:"Katrs vīruss atrod tevi. Slimokases — tava otrā māja. Ķermenis karo ar sevi." },
+        { emoji:"💸", title:"Pilnīgi nesaimnieciski", desc:"Nauda izslīd kā smiltis. Budžets, plānošana, uzkrājumi — tas viss ir svešvārdi. Bankrots vienmēr tuvumā." },
+        { emoji:"😴", title:"Hronisks nogurums", desc:"Neatkarīgi cik guļi — vienmēr noguris. Enerģija izķūst nekur. Dzīve ritina tevi, nevis tu to." },
+        { emoji:"☣️", title:"Ekstrēmas alerģijas", desc: "Tev ir alerģija pret teju visu: riekstiem, putekļiem, dzīvnieku spalvām, glutēnu." },
+        { emoji:"🦴", title:"Stikla cilvēks", desc: "Tavi kauli ir neparasti trausli. Katrs nopietnāks kritiens var beigties ar lūzumu." },
+        { emoji:"🏠", title:"Dumpīgais pusaudzis", desc: "15 gadu vecumā tu sastrīdēsies ar saviem vecākiem un tiksi izmests no mājas."},
+        { emoji:"🙏", title:"Reliģiskā minoritāte", desc: "Lai kur tu piedzimtu, tava ģimene un tu vienmēr būs tās valsts reliģiskā minoritāte."},
+    ];
+
+    let nvnSelectedWildcard = null;
+
+    function wildcardBadgeHtml() {
+        if (!window._lastWildcard) return '';
+        const wc = window._lastWildcard;
+        return `<span class="wildcard-badge debuff-badge">${wc.card.emoji} ${wc.card.title}</span>`;
+    }
+
+    const Valstis = [
+        { nosaukums:"Indija", berni:23426809}, { nosaukums:"Ķīna", berni:9003350}, { nosaukums:"Nigērija", berni:7667719},
+        { nosaukums:"Pakistāna", berni:6986790}, { nosaukums:"Indonēzija", berni:4519081}, { nosaukums:"Kongo Demokrātiskā Republika", berni:4513656},
+        { nosaukums:"Etiopija", berni:4213102}, { nosaukums:"Amerikas Savienotās Valstis", berni:3639187}, { nosaukums:"Bangladeša", berni:3532514},
+        { nosaukums:"Brazīlija", berni:2612246}, { nosaukums:"Ēģipte", berni:2447769}, { nosaukums:"Tanzānija", berni:2414825},
+        { nosaukums:"Meksika", berni:2055302}, { nosaukums:"Filipīnas", berni:1855699}, { nosaukums:"Uganda", berni:1760581},
+        { nosaukums:"Sudāna", berni:1695690}, { nosaukums:"Kenija", berni:1529671}, { nosaukums:"Afganistāna", berni:1511299},
+        { nosaukums:"Jemena", berni:1428892}, { nosaukums:"Angola", berni:1424053}, { nosaukums:"Vjetnama", berni:1396760},
+        { nosaukums:"Mozambika", berni:1298206}, { nosaukums:"Krievija", berni:1234391}, { nosaukums:"Dienvidāfrika", berni:1201734},
+        { nosaukums:"Irāna", berni:1185893}, { nosaukums:"Irāka", berni:1184568}, { nosaukums:"Nigēra", berni:1132441},
+        { nosaukums:"Madagaskāra", berni:1025915}, { nosaukums:"Kotdivuāra", berni:1021576}, { nosaukums:"Kamerūna", berni:982722},
+        { nosaukums:"Mali", berni:979853}, { nosaukums:"Uzbekistāna", berni:962316}, { nosaukums:"Turcija", berni:957809},
+        { nosaukums:"Alžīrija", berni:918730}, { nosaukums:"Mjanmara", berni:909933}, { nosaukums:"Gana", berni:905785},
+        { nosaukums:"Čada", berni:860601}, { nosaukums:"Somālija", berni:816709}, { nosaukums:"Burkinafaso", berni:745154},
+        { nosaukums:"Japāna", berni:743852}, { nosaukums:"Kolumbija", berni:712643}, { nosaukums:"Zambija", berni:705120},
+        { nosaukums:"Apvienotā Karaliste", berni:693852}, { nosaukums:"Vācija", berni:693187}, { nosaukums:"Malāvija", berni:679564},
+        { nosaukums:"Francija", berni:678661}, { nosaukums:"Maroka", berni:635993}, { nosaukums:"Taizeme", berni:590902},
+        { nosaukums:"Saūda Arābija", berni:579454}, { nosaukums:"Nepāla", berni:573451}, { nosaukums:"Peru", berni:545569},
+        { nosaukums:"Sīrija", berni:545440}, { nosaukums:"Senegāla", berni:544383}, { nosaukums:"Zimbabve", berni:505851},
+        { nosaukums:"Argentīna", berni:505582}, { nosaukums:"Gvineja", berni:499419}, { nosaukums:"Benina", berni:489982},
+        { nosaukums:"Burundija", berni:472946}, { nosaukums:"Malaizija", berni:441341}, { nosaukums:"Venecuēla", berni:428554},
+        { nosaukums:"Kazahstāna", berni:414693}, { nosaukums:"Ruanda", berni:404145}, { nosaukums:"Gvatemala", berni:383017},
+        { nosaukums:"Itālija", berni:377297}, { nosaukums:"Kambodija", berni:366040}, { nosaukums:"Kanāda", berni:363339},
+        { nosaukums:"Ziemeļkoreja", berni:343080}, { nosaukums:"Dienvidsudāna", berni:341462}, { nosaukums:"Spānija", berni:327287},
+        { nosaukums:"Togo", berni:296323}, { nosaukums:"Austrālija", berni:293725}, { nosaukums:"Tadžikistāna", berni:276677},
+        { nosaukums:"Ekvadora", berni:272630}, { nosaukums:"Polija", berni:270538}, { nosaukums:"Sjerraleone", berni:264454},
+        { nosaukums:"Bolīvija", berni:263745}, { nosaukums:"Haiti", berni:261350}, { nosaukums:"Papua-Jaungvineja", berni:259928},
+        { nosaukums:"Centrālāfrikas Republika", berni:247120}, { nosaukums:"Šrilanka", berni:245459}, { nosaukums:"Jordānija", berni:238116},
+        { nosaukums:"Hondurasa", berni:237764}, { nosaukums:"Dienvidkoreja", berni:232879}, { nosaukums:"Ukraina", berni:212963},
+        { nosaukums:"Dominikānas Republika", berni:204907}, { nosaukums:"Kongo Republika", berni:193959}, { nosaukums:"Izraēla", berni:193959},
+        { nosaukums:"Mauritānija", berni:177946}, { nosaukums:"Čīle", berni:177151}, { nosaukums:"Libērija", berni:173772},
+        { nosaukums:"Tunisija", berni:168785}, { nosaukums:"Nīderlande", berni:165540}, { nosaukums:"Laosa", berni:165271},
+        { nosaukums:"Turkmenistāna", berni:165271}, { nosaukums:"Rumānija", berni:152414}, { nosaukums:"Kirgizstāna", berni:148770},
+        { nosaukums:"Palestīna", berni:143135}, { nosaukums:"Paragvaja", berni:138479}, { nosaukums:"Nikaragva", berni:134007},
+        { nosaukums:"Lībija", berni:125654}, { nosaukums:"Azerbaidžāna", berni:113251}, { nosaukums:"Beļģija", berni:111470},
+        { nosaukums:"Apvienotie Arābu Emirāti", berni:107381}, { nosaukums:"Eritreja", berni:100920}, { nosaukums:"Zviedrija", berni:100412},
+        { nosaukums:"Salvadora", berni:99877}, { nosaukums:"Kuba", berni:95589}, { nosaukums:"Libāna", berni:93731},
+        { nosaukums:"Čehija", berni:91602}, { nosaukums:"Omāna", berni:88978}, { nosaukums:"Ungārija", berni:87014},
+        { nosaukums:"Portugāle", berni:86626}, { nosaukums:"Gambija", berni:83983}, { nosaukums:"Šveice", berni:81050},
+        { nosaukums:"Namībija", berni:78450}, { nosaukums:"Austrija", berni:78012}, { nosaukums:"Panama", berni:72380},
+        { nosaukums:"Grieķija", berni:70754}, { nosaukums:"Gabona", berni:70242}, { nosaukums:"Mongolija", berni:66970},
+        { nosaukums:"Gvineja-Bisava", berni:66122}, { nosaukums:"Baltkrievija", berni:65170}, { nosaukums:"Botsvana", berni:62304},
+        { nosaukums:"Serbija", berni:60595}, { nosaukums:"Dānija", berni:57976}, { nosaukums:"Jaunzēlande", berni:57422},
+        { nosaukums:"Bulgārija", berni:57328}, { nosaukums:"Lesoto", berni:56352}, { nosaukums:"Ekvatoriālā Gvineja", berni:56026},
+        { nosaukums:"Īrija", berni:55576}, { nosaukums:"Norvēģija", berni:52379}, { nosaukums:"Kostarika", berni:52217},
+        { nosaukums:"Kuveita", berni:50455}, { nosaukums:"Slovākija", berni:48798}, { nosaukums:"Singapūra", berni:44672},
+        { nosaukums:"Somija", berni:43835}, { nosaukums:"Gruzija", berni:42522}, { nosaukums:"Armēnija", berni:37312},
+        { nosaukums:"Urugvaja", berni:33429}, { nosaukums:"Honkonga", berni:33106}, { nosaukums:"Jamaika", berni:32999},
+        { nosaukums:"Horvātija", berni:32089}, { nosaukums:"Austrumtimora", berni:30921}, { nosaukums:"Katara", berni:28315},
+        { nosaukums:"Komoras", berni:24831}, { nosaukums:"Svatini", berni:29918}, { nosaukums:"Moldova", berni:25836},
+        { nosaukums:"Bosnija un Hercegovina", berni:24409}, { nosaukums:"Albānija", berni:24351}, { nosaukums:"Džibutija", berni:24273},
+        { nosaukums:"Zālamana Salas", berni:22065}, { nosaukums:"Lietuva", berni:20795}, { nosaukums:"Bahreina", berni:19794},
+        { nosaukums:"Kosova", berni:19239}, { nosaukums:"Puertoriko", berni:18579}, { nosaukums:"Slovēnija", berni:17019},
+        { nosaukums:"Gajāna", berni:16860}, { nosaukums:"Ziemeļmaķedonija", berni:16784}, { nosaukums:"Fidži", berni:16714},
+        { nosaukums:"Kipra", berni:14668}, { nosaukums:"Trinidāda un Tobāgo", berni:14652}, { nosaukums:"Latvija", berni:14369},
+        { nosaukums:"Maurīcija", berni:12706}, { nosaukums:"Igaunija", berni:10978}
+    ];
+
+    function generateResult() {
+        let kopejaDzimstiba = Valstis.reduce((sum, v) => sum + v.berni, 0);
+        let randomSvars = Math.random() * kopejaDzimstiba;
+        let izveletaValsts = Valstis[Valstis.length - 1].nosaukums;
+        for (let v of Valstis) {
+            randomSvars -= v.berni;
+            if (randomSvars <= 0) { izveletaValsts = v.nosaukums; break; }
+        }
+        let ienakumi = Math.floor(Math.random() * 99) + 1;
+        const vietas = ["laukos", "mazā pilsētā", "vidēja izmēra pilsētā", "lielā pilsētā"];
+        let nejausaVieta = vietas[Math.floor(Math.random() * vietas.length)];
+        let dzimums = Math.random() < 0.5 ? "Sieviete" : "Vīrietis";
+        let iqLimenis = generēZvanaSkaitli(100, 15);
+        return { valsts: izveletaValsts, ienakumi, vieta: nejausaVieta, dzimums,iqLimenis };
+    }
+
+    function StartSimulation() {
+        window._lastWildcard = null;
+        const r = generateResult();
+        document.getElementById("rezultats").innerHTML = `
+            <div class="option-card select-none">
+                <h3>Apsveicam! Tu piedzimi:</h3>
+                <p><b>Valsts:</b> ${r.valsts}</p>
+                <p><b>Dzimums:</b> ${r.dzimums}</p>
+                <p><b>Vide:</b> Tu piedzimi ${r.vieta}</p>
+                <p><b>Finanses:</b> ${r.ienakumi}% ${r.valsts}s iedzīvotāju ir lielāki ienākumi nekā tev.</p>
+                <p><b>Intelekts:</b> Tev ir ${r.iqLimenis} IQ.
+            </div>`;
+            getAIJudgment({
+        valsts: r.valsts,
+        dzimums: r.dzimums,
+        vieta: r.vieta,
+        ienakumi: r.ienakumi,
+        iqLimenis: r.iqLimenis,
+        wildcard: null
+    }, "ai-sim-container");
+
+    }
+
+    // ---- Ņemt vai neņemt state ----
+    let nvnSimulations = [];
+    let nvnCurrent = 0;
+    let nvnChosen = null;
+    const TOTAL = 5;
+
+    function StartNVN() {
+        window._lastWildcard = null;
+        nvnSelectedWildcard = null;
+        
+        // Atlasām 3 unikālas kārtis tikai no DEBUFFS saraksta
+        const allCards = [];
+        DEBUFFS.forEach(d => allCards.push({ type: 'debuff', card: d }));
+        const shuffled = allCards.sort(() => 0.5 - Math.random());
+        const draftChoices = shuffled.slice(0, 3);
+        window._currentDraft = draftChoices;
+
+        document.getElementById("menu-view").style.display = "none";
+        const container = document.getElementById("nvn-container");
+        container.style.display = "block";
+
+        let cardsHtml = draftChoices.map((item, idx) => `
+            <div class="draft-card ${item.type} select-none" onclick="selectDraftWildcard(${idx})">
+                <div class="draft-emoji">${item.card.emoji}</div>
+                <div class="draft-name">${item.card.title}</div>
+                <div class="draft-desc">${item.card.desc}</div>
+            </div>
+        `).join('');
+
+        document.getElementById("nvn-inner").innerHTML = `
+            <div class="slide-in">
+                <h3 class="wildcard-draft-title">Izvēlies savu dzīves izaicinājumu (Wild Card)</h3>
+                <p class="description select-none" style="text-align:center; margin-bottom:10px;">Tev būs jāizvēlas viena no 5 dzīves simulācijām, mēģinot to maksimāli gudri pielāgot šim apgrūtinājumam!</p>
+                <div class="wildcard-draft-grid">${cardsHtml}</div>
+            </div>`;
+    }
+
+    function selectDraftWildcard(index) {
+        nvnSelectedWildcard = window._currentDraft[index];
+        window._currentDraft = null;
+        
+        nvnSimulations = Array.from({length: TOTAL}, generateResult);
+        nvnCurrent = 0;
+        nvnChosen = null;
+        renderNVN();
+    }
+
+    function renderNVN() {
+        const container = document.getElementById("nvn-inner");
+        if (nvnChosen !== null) {
+            renderNVNFinal(container);
+            return;
+        }
+        const r = nvnSimulations[nvnCurrent];
+        const isLast = nvnCurrent === TOTAL - 1;
+
+        let dots = "";
+        for (let i = 0; i < TOTAL; i++) {
+            if (i < nvnCurrent) dots += `<div class="nvn-progress-dot done"></div>`;
+            else if (i === nvnCurrent) dots += `<div class="nvn-progress-dot current"></div>`;
+            else dots += `<div class="nvn-progress-dot"></div>`;
+        }
+
+        const wcBanner = `
+            <div class="nvn-active-wildcard ${nvnSelectedWildcard.type} select-none">
+                <b>Tavs apgrūtinājums:</b> ${nvnSelectedWildcard.card.emoji} <b>${nvnSelectedWildcard.card.title}</b> — ${nvnSelectedWildcard.card.desc}
+            </div>`;
+
+        container.innerHTML = `
+        <div class="nvn-card slide-in select-none">
+            <div class="nvn-header">
+                <span class="nvn-counter">SIMULĀCIJA ${nvnCurrent + 1} NO ${TOTAL}</span>
+                ${nvnCurrent < TOTAL - 1 ? `<span class="nvn-unknown-badge">? Vēl ${TOTAL - nvnCurrent - 1} nezināmas</span>` : `<span class="nvn-unknown-badge" style="background:#e74c3c;">Pēdējā!</span>`}
+            </div>
+            <div class="nvn-progress-bar">${dots}</div>
+            
+            ${wcBanner}
+
+            <div class="nvn-result-display">
+                <h3>Tu piedzimi:</h3>
+                <p><b>Valsts:</b> ${r.valsts}</p>
+                <p><b>Dzimums:</b> ${r.dzimums}</p>
+                <p><b>Vide:</b> Tu nāc no ${r.vieta}</p>
+                <p><b>Finanses:</b> ${r.ienakumi}% ${r.valsts}s iedzīvotāju ir lielāki ienākumi nekā tev.</p>
+            </div>
+            <div class="nvn-actions">
+                <button class="nvn-btn-accept" onclick="nvnAccept()">✓ Ņemt!</button>
+                ${!isLast
+                    ? `<button class="nvn-btn-reject" onclick="nvnReject()">✗ Neņemt</button>`
+                    : `<button class="nvn-btn-reject" style="background:#95a5a6;cursor:not-allowed;" disabled>✗ Neņemt</button>`
+                }
+            </div>
+            ${!isLast
+                ? `<p class="nvn-tip">Noraidot, tu nevarēsi atgriezties pie šī varianta.</p>`
+                : `<p class="nvn-tip" style="color:#e74c3c;">Šī ir pēdējā izvēle — tev tā jāņem!</p>`
+            }
+        </div>`;
+    }
+
+    function nvnAccept() {
+        nvnChosen = nvnCurrent;
+        window._lastWildcard = nvnSelectedWildcard; 
+        renderNVNFinal(document.getElementById("nvn-inner"));
+    }
+
+    function nvnReject() {
+        if (nvnCurrent < TOTAL - 1) {
+            nvnCurrent++;
+            renderNVN();
+        }
+    }
+
+    function renderNVNFinal(container) {
+        const chosen = nvnChosen !== null ? nvnChosen : TOTAL - 1;
+        const r = nvnSimulations[chosen];
+        const wasForced = nvnChosen === null;
+        const badge = wasForced
+            ? `<span class="nvn-forced-badge">Piespiests ņemt</span>`
+            : `<span class="nvn-chosen-badge">Izvēlēts brīvprātīgi</span>`;
+
+        let skippedHtml = "";
+        if (chosen > 0) {
+            skippedHtml = `<div class="nvn-skipped-list">
+                <h4>Noraidītie varianti (${chosen}):</h4>`;
+            for (let i = 0; i < chosen; i++) {
+                const s = nvnSimulations[i];
+                skippedHtml += `<div class="nvn-skipped-item">${i+1}. ${s.valsts} — ${s.dzimums}, ${s.vieta}, ${s.ienakumi}tais ienākumu %</div>`;
+            }
+            skippedHtml += `</div>`;
+        }
+
+        let unseenHtml = "";
+        const unseenCount = TOTAL - 1 - chosen;
+        if (unseenCount > 0) {
+            unseenHtml = `<div class="nvn-skipped-list">
+                <h4>Neredzētie varianti (${unseenCount}):</h4>`;
+            for (let i = chosen + 1; i < TOTAL; i++) {
+                const s = nvnSimulations[i];
+                unseenHtml += `<div class="nvn-skipped-item">${i+1}. ${s.valsts} — ${s.dzimums}, ${s.vieta}, ${s.ienakumi}tais ienākumu %</div>`;
+            }
+            unseenHtml += `</div>`;
+        }
+
+        container.innerHTML = `
+        <div class="nvn-final-card slide-in select-none">
+            <h3>🎉 Tavs liktenis! ${badge}${wildcardBadgeHtml()}</h3>
+            ${window._lastWildcard ? `<p style="font-size:14px;color:#7f8c8d;margin-bottom:12px;">${window._lastWildcard.card.emoji} <b>${window._lastWildcard.card.title}:</b> ${window._lastWildcard.card.desc}</p>` : ""}
+            <div class="result-label">Valsts</div>
+            <div class="result-value">${r.valsts}</div>
+            <div class="result-label">Dzimums</div>
+            <div class="result-value">${r.dzimums}</div>
+            <div class="result-label">Vide</div>
+            <div class="result-value">Tu piedzimi ${r.vieta}</div>
+            <div class="result-label">Finanses</div>
+            <div class="result-value">${r.ienakumi}% ${r.valsts}s iedzīvotāju ir lielāki ienākumi nekā tavai ģimenei.</div>
+            <div id="ai-nvn-container"></div>
+            ${skippedHtml}
+            ${unseenHtml}
+        <button class="nvn-restart-btn" onclick="backToMenu()">↩ Atpakaļ uz sākumu</button>
+    </div>`;
+    getAIJudgment({
+        valsts: r.valsts,
+        dzimums: r.dzimums,
+        vieta: r.vieta,
+        ienakumi: r.ienakumi,
+        iqLimenis: r.iqLimenis, // Note: your nvn simulations use generateResult which includes iqLimenis
+        wildcard: window._lastWildcard ? window._lastWildcard.card : null
+    }, "ai-nvn-container");
+}
+
+    function backToMenu() {
+        document.getElementById("nvn-container").style.display = "none";
+        document.getElementById("menu-view").style.display = "block";
+        document.getElementById("rezultats").innerHTML = "";
+        window._lastWildcard = null;
+        nvnSelectedWildcard = null;
+    }
+
+    function toggleDark() {
+        const isDark = document.body.classList.toggle("dark");
+        document.getElementById("dark-toggle").textContent = isDark ? "☀️" : "🌙";
+        localStorage.setItem("darkMode", isDark ? "1" : "0");
+    }
+    (function() {
+        if (localStorage.getItem("darkMode") === "1") {
+            document.body.classList.add("dark");
+            document.getElementById("dark-toggle").textContent = "☀️";
+        }
+    })();
+
+    async function getAIJudgment(factors, targetElementId) {
+    const container = document.getElementById(targetElementId);
+    if (!container) return;
+
+    // Insert a stylized loading indicator
+    container.innerHTML = `
+        <div style="text-align:center; padding:15px; color:#7f8c8d;">
+            <span style="display:inline-block; animation: spin 1s linear infinite; margin-bottom:8px;">⏳</span>
+            <p style="margin:0; font-size:14px;">Mākslīgais intelekts analizē Tavu likteni...</p>
+        </div>
+        <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+    `;
+
+    try {
+        const response = await fetch('/api/judge', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(factors)
+        });
+
+        const data = await response.json();
+        if (data.error) throw new Error(data.error);
+
+        // Format raw text paragraph breaks neatly into HTML
+        const formattedText = data.judgment.split('\n\n').map(p => `<p style="line-height:1.6; margin-bottom:12px;">${p}</p>`).join('');
+
+        container.innerHTML = `
+            <div style="margin-top:20px; border-top:2px dashed #3498db; padding-top:15px;">
+                <h4 style="margin-top:0; color:#3498db; text-align:center;">🔮 MI Dzīves Spriedums</h4>
+                <div style="font-size:14px; text-align:left; color: inherit;">${formattedText}</div>
+            </div>
+        `;
+    } catch (err) {
+        container.innerHTML = `<p style="color:#e74c3c; font-size:13px; text-align:center;">Neizdevās iegūt MI prognozi: ${err.message}</p>`;
+    }
+}
+    </script>
+</body>
+</html>
